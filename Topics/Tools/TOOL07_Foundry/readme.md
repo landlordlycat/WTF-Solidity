@@ -6,7 +6,7 @@
 
 社区：[Discord](https://discord.gg/5akcruXrsk)｜[微信群](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[官网 wtf.academy](https://wtf.academy)
 
-所有代码和教程开源在github: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+所有代码和教程开源在github: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 -----
 
@@ -205,9 +205,9 @@ contract CounterScript is Script {
 
     // 部署合约时会调用run()函数
     function run() public {
-        vm.startBroadcast(); // 开始部署
+        vm.startBroadcast(); // 开始记录脚本中合约的调用和创建
         new Counter(); // 创建合约
-        vm.stopBroadcast(); // 结束部署
+        vm.stopBroadcast(); // 结束记录
     }
 }
 ```
@@ -293,7 +293,7 @@ Test result: ok. 2 passed; 0 failed; finished in 9.98ms
 
 <!--
 
-  TODO: For foundry advanced useage ...
+  TODO: For foundry advanced usage ...
 
   We need cover: 
   
@@ -327,7 +327,7 @@ Test result: ok. 2 passed; 0 failed; finished in 9.98ms
 ### 查询区块
 
 ```shell
-# $PRC_MAIN 替换成需要的RPC地址
+# $RPC_MAIN 替换成需要的RPC地址
 cast block-number --rpc-url=$RPC_MAIN
 ```
 
@@ -336,8 +336,7 @@ cast block-number --rpc-url=$RPC_MAIN
 ```
 15769241
 ```
-
-> 将环境变量的`ETH_PRC_URL`设置为 `--rpc-url` 你就不需要在每个命令行后面增加  `--rpc-url=$RPC_MAIN`  我这里直接设置为主网
+> 将环境变量的ETH_RPC_URL设置为 --rpc-url 你就不需要在每个命令行后面增加 --rpc-url=$RPC_MAIN 我这里直接设置为主网
 
 ### 查询区块信息
 
@@ -551,7 +550,7 @@ cast wallet new  ~/Downloads
 第一条命令行结果输出：
 
 ```shell
-Successfully created new keypair.
+Successfully created new key pair.
 Address: 0xDD20b18E001A80d8b27B8Caa94EeAC884D1c****
 Private Key: edb4444199bddea91879c0214af27c0c7f99****bf18e46ba4078a39ccdbe0bc
 ```
@@ -596,9 +595,9 @@ cast etherscan-source 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 --etherscan-api
 cast etherscan-source $WETH -d ~/Downloads
 ```
 
-### 调用合约
+### 调用合约(读数据)
 
-调用 WETH合约的`balanceOf`方法,查看`0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`账号的余额
+`cast call` 用于从区块链上读取数据（调用只读函数），该操作不会改变区块链状态，也不需要支付 Gas 费用。下面我们调用 `WETH` 合约的`balanceOf`方法,查看 `0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2` 账号的余额
 
 ```shell
 #cast call [OPTIONS] [TO] [SIG] [ARGS]... [COMMAND] --rpc-url=$RPC
@@ -616,6 +615,18 @@ cast call $WETH "balanceOf(address)(uint256)" 0xC02aaA39b223FE8D0A0e5C4F27eAD908
 # 646577988758891995548
 
 ```
+
+### 调用合约(写数据)
+
+`cast send` 用于发送交易并修改区块链状态（调用改变状态的函数），该操作会消耗 Gas 费用，需要签名并发送交易。
+
+```shell
+#cast send [OPTIONS] [TO] [SIG] [ARGS]... [COMMAND] --rpc-url=$RPC
+
+cast send 0x... "deposit(address,uint256)" 0x... 1 --rpc-url=$RPC
+
+```
+
 
 ### 解析ABI
 
@@ -644,8 +655,14 @@ cast --from-rlp
 
 ## Tips
 
-### 设置ETH_PRC_URL
-将环境变量的`ETH_PRC_URL`设置为 `--rpc-url` 你就不需要在每个命令行后面增加  `--rpc-url=$RPC_MAIN`  我这里直接设置为主网
+### 设置ETH_RPC_URL
+将环境变量的`ETH_RPC_URL`设置为 `--rpc-url`的值，这样你就不需要在每个命令行后面增加 `--rpc-url=$RPC_MAIN`，我这里直接设置为主网，如下：
+``` shell
+export ETH_RPC_URL=your_rpc_url
+source ~/.bashrc  # 如果你使用的是 Bash
+source ~/.zshrc   # 如果你使用的是 Zsh
+cast block-number # 不用再配置 --rpc-url 参数
+```
 
 ### 设置ETHERSCAN_API_KEY
 设置`ETHERSCAN_API_KEY`环境变量可以直接代替 `--etherscan-api-key`
@@ -671,7 +688,7 @@ anvil --mnemonic=<MNEMONIC>
 anvil --fork-url=$RPC --fork-block-number=<BLOCK>
 ```
 
-### PRC的使用
+### RPC的使用
 
 ```shell
 anvil_* -> hardhat_* 
@@ -712,6 +729,7 @@ anvil_setStorageAt
 
 forge init <dir_name> 
 
+# 使用模板初始化项目
 forge init --template <template_path> <dir_name>
 
 ```
@@ -726,8 +744,10 @@ forge build -w
 ### 测试
 
 ```shell
-# 三个v会现实详细的log信息
+# 三个v会现实详细的log信息，还显示失败测试的堆栈跟踪
 forge test -vvv
+# 四个v显示所有测试的堆栈跟踪，并显示失败测试的设置（setup）跟踪。
+forge test -vvvv
 # 热更新模式
 forge test -vvv -w
 
@@ -756,14 +776,15 @@ function testNumberIs42() public {
     }
 ```
 
-改变状态
+改变 block.timestamp
 
 ```js
 
-function testCheatCode()public
-console2.Log("before:"block.timestamp);
-vm.warp(1000);
-console2.log("after:"block.timestamp);
+function testCheatCode()public {
+  console2.Log("before:"block.timestamp);
+  vm.warp(1000);
+  console2.log("after:"block.timestamp);
+}
 
 ```
 
@@ -782,7 +803,7 @@ vm.stopPrank()
 ```
 
 
-改变存储状态
+改变账户余额（也可以用于改变大多数ERC20代币余额）
 
 ```js
 function testCheatCode()public{
@@ -883,7 +904,7 @@ contract Helper {
 
 运行测试：
 
-因为本地没有dai的部署合约，所以我们直接fork主网， -vvv可以现实console2.log，-w表示watch模式。
+因为本地没有dai的部署合约，所以我们直接fork主网， -vvv可以显示console2.log，-w表示watch模式。
 
 ```shell
 forge test -vvv --fork-url=$ETH_RPC_URL -w
@@ -1076,7 +1097,7 @@ forge script script/Counter.s.sol --sig="someFunction(uint256 x)" 10
 ## 脚本部署合约
 
 编写部署脚本：
-```shell
+```solidity
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
@@ -1085,18 +1106,18 @@ import "forge-std/Script.sol";
 import "../src/Counter.sol";
 
 contract CounterScript is Script {
-    function setUp() public {
-        console2.log("setup ");
-    }
+  function setUp() public {
+    console2.log("setup ");
+  }
 
-    function run() public {
-        vm.startBroadcast();
-		//生成合约对象
-        Counter c = new Counter();
-
-        vm.stopBroadcast();
-    }
-
+  function run() public {
+    // 开始记录脚本中合约的调用和创建
+    vm.startBroadcast();
+    //生成合约对象
+    Counter c = new Counter();
+    // 结束记录
+    vm.stopBroadcast();
+  }
 }
 
 ```
@@ -1110,7 +1131,7 @@ forge script script/Counter.s.sol -vvvv --rpc-url=http://127.0.0.1:8545
 正式部署：
 
 ```
-forge script script/Counter.s.sol -vvvv --rpc-url=http://127.0.0.1:8545 --broadcast --private-key=privete_key
+forge script script/Counter.s.sol -vvvv --rpc-url=$RPC_MAIN --broadcast --private-key=privete_key
 ```
 
 部署完成之后会多一个broadcast文件夹，查看该文件夹有`run-latest.json`可以看到部署的相应信息。
@@ -1124,17 +1145,30 @@ forge script script/Counter.s.sol -vvvv --rpc-url=http://127.0.0.1:8545 --broadc
 uint256 mainnet = vm.createFork(rpc);
 ```
 
+## 命令行部署合约
+
+部署并开源合约，其中 `--etherscan-api-key` 为以太坊浏览器（或其他 EVM 浏览器）中申请的 API key，`--verify` 为部署后开源合约。
+```solidity
+# forge create --rpc-url <your_rpc_url> --private-key <your_private_key> --etherscan-api-key <KEY> --verify src/YourContract.sol:YourContract --constructor-args <constructor_args>
+  forge create --rpc-url $RPC_MAIN \ 
+   --private-key privete_key  \ 
+   --etherscan-api-key xxxx  \ 
+   --verify \
+   src/Counter.sol:Counter
+```
+
 ## Tips： 
 
 ```shell
 forge test --gas-report
 
-forge inspect
+# 获取合约相关信息，例如abi、bytecode等等
+forge inspect <CONTRACT> <FIELD>
 
-# 对比gas是否减少
-
+# 生成gas快照
 forge snapshot
 
+# 当前快照文件与最新更改进行比较，对比gas是否减少
 forge snapshot --diff 
 
 # 交互式Debugger

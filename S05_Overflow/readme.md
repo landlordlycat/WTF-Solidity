@@ -7,15 +7,15 @@ tags:
 
 # WTF Solidity 合约安全: S05. 整型溢出
 
-我最近在重新学solidity，巩固一下细节，也写一个“WTF Solidity极简入门”，供小白们使用（编程大佬可以另找教程），每周更新1-3讲。
+我最近在重新学 Solidity，巩固一下细节，也写一个“WTF Solidity 合约安全”，供小白们使用（编程大佬可以另找教程），每周更新 1-3 讲。
 
 推特：[@0xAA_Science](https://twitter.com/0xAA_Science)｜[@WTFAcademy_](https://twitter.com/WTFAcademy_)
 
 社区：[Discord](https://discord.gg/5akcruXrsk)｜[微信群](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[官网 wtf.academy](https://wtf.academy)
 
-所有代码和教程开源在github: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+所有代码和教程开源在 github: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
------
+---
 
 这一讲，我们将介绍整型溢出漏洞（Arithmetic Over/Under Flows）。这是一个比较经典的漏洞，Solidity 0.8版本后内置了Safemath库，因此很少发生。
 
@@ -43,7 +43,7 @@ tags:
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
 contract Token {
   mapping(address => uint) balances;
@@ -75,7 +75,7 @@ contract Token {
 
 ## 预防办法
 
-1. Solidity `0.8.0` 之前的版本，在合约中引用 [Safemath 库](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol)，在整型溢出时报错。
+1. Solidity `0.8.0` 之前的版本，在合约中引用 [Safemath 库](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.9/contracts/utils/math/SafeMath.sol)，在整型溢出时报错。
 
 2. Solidity `0.8.0` 之后的版本内置了 `Safemath`，因此几乎不存在这类问题。开发者有时会为了节省gas使用 `unchecked` 关键字在代码块中临时关闭整型溢出检测，这时要确保不存在整型溢出漏洞。
 

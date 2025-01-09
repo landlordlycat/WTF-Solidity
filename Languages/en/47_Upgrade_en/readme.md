@@ -15,7 +15,7 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science)
 
 Community: [Discord](https://discord.gg/5akcruXrsk)｜[WeChat group](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[Official website wtf.academy](https://wtf.academy)
 
-All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 -----
 
@@ -33,7 +33,7 @@ Below we implement a simple upgradeable contract that includes 3 contracts: the 
 
 ### Proxy Contract
 
-This proxy contract is simpler than that in [Lecture 46](https://github.com/AmazingAng/WTFSolidity/blob/main/Languages/en/46_ProxyContract_en/readme.md). We didn't use inline assembly in its `fallback()` function, but only used `implementation.delegatecall(msg.data);`. Therefore, the callback function does not return a value, but it is sufficient for teaching purposes.
+This proxy contract is simpler than that in [Lecture 46](https://github.com/AmazingAng/WTF-Solidity/blob/main/Languages/en/46_ProxyContract_en/readme.md). We didn't use inline assembly in its `fallback()` function, but only used `implementation.delegatecall(msg.data);`. Therefore, the callback function does not return a value, but it is sufficient for teaching purposes.
 
 It contains 3 variables:
 - `implementation`: The logic contract address.
@@ -44,14 +44,14 @@ It contains `3` functions:
 
 - Constructor: Initializes admin and logic contract addresses.
 - `fallback()`: Callback function, delegates the call to the logic contract.
-- `upgrade()`: Upgrade function, changes the logic contract's address, can only be called by `admin`.
+- `upgrade()`: The upgrade function, changes the logic contract's address, and can only be called by `admin`.
 
 ```solidity
 // SPDX-License-Identifier: MIT
 // wtf.academy
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
-// simple upgradeable contract, the admin could change the logic contract's address by calling upgrade function, thus change the contract logic
+// simple upgradeable contract, the admin could change the logic contract's address by calling the upgrade function, thus changing the contract logic
 // FOR TEACHING PURPOSE ONLY, DO NOT USE IN PRODUCTION
 contract SimpleUpgrade {
     // logic contract's address
@@ -60,7 +60,7 @@ contract SimpleUpgrade {
     // admin address
     address public admin;
 
-    // string variable, could be changed by logic contract's function
+    // string variable, could be changed by the logic contract's function
     string public words; 
 
     // constructor, initializing admin address and logic contract's address
@@ -74,7 +74,7 @@ contract SimpleUpgrade {
         (bool success, bytes memory data) = implementation.delegatecall(msg.data);
     }
 
-    // upgrade function, changes the logic contract's address, can only by called by admin
+    // upgrade function, changes the logic contract's address, can only be called by admin
     function upgrade(address newImplementation) external {
         require(msg.sender == admin);
         implementation = newImplementation;
@@ -109,7 +109,7 @@ This logic contract contains `3` state variables, consistent with the proxy cont
 ```solidity
 // Logic Contract 2
 contract Logic2 {
-    // State variables consistent with proxy contract to prevent slot collisions
+    // State variables consistent with a proxy contract to prevent slot collisions
     address public implementation; 
     address public admin;
     // String that can be changed through the function of the logic contract  
@@ -142,4 +142,4 @@ contract Logic2 {
 
 ## Summary
 
-In this lesson, we introduced a simple upgradeable contract. It is a proxy contract that can change the logic contract and adds upgrade functionality to immutable smart contracts. However, this contract has a problem of selector conflict and poses security risks. Later, we will introduce the upgradeable contract standards that solve this vulnerability: Transparent Proxy and UUPS.
+In this lesson, we introduced a simple upgradeable contract. It is a proxy contract that can change the logic contract and add upgrade functionality to immutable smart contracts. However, this contract has a problem of selector conflict and poses security risks. Later, we will introduce the upgradeable contract standards that solve this vulnerability: Transparent Proxy and UUPS.

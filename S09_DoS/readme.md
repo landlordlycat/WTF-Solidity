@@ -8,13 +8,13 @@ tags:
 
 # WTF Solidity 合约安全: S09. 拒绝服务
 
-我最近在重新学 solidity，巩固一下细节，也写一个“WTF Solidity 极简入门”，供小白们使用（编程大佬可以另找教程），每周更新 1-3 讲。
+我最近在重新学 Solidity，巩固一下细节，也写一个“WTF Solidity 合约安全”，供小白们使用（编程大佬可以另找教程），每周更新 1-3 讲。
 
 推特：[@0xAA_Science](https://twitter.com/0xAA_Science)｜[@WTFAcademy_](https://twitter.com/WTFAcademy_)
 
 社区：[Discord](https://discord.gg/5akcruXrsk)｜[微信群](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[官网 wtf.academy](https://wtf.academy)
 
-所有代码和教程开源在 github: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+所有代码和教程开源在 github: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 ---
 
@@ -34,9 +34,9 @@ tags:
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
-// 有DoS漏洞的游戏，玩家们先存钱，游戏结束后，调用deposit退钱。
+// 有DoS漏洞的游戏，玩家们先存钱，游戏结束后，调用refund退钱。
 contract DoSGame {
     bool public refundFinished;
     mapping(address => uint256) public balanceOf;
@@ -117,7 +117,7 @@ contract Attack {
 2. 合约不会出乎意料的自毁。
 3. 合约不会进入无限循环。
 4. `require` 和 `assert` 的参数设定正确。
-5. 退款时，让用户从合约自行领取（push），而非批量发送给用户(pull)。
+5. 退款时，让用户从合约自行领取（pull），而非批量发送给用户(push)。
 6. 确保回调函数不会影响正常合约运行。
 7. 确保当合约的参与者（例如 `owner`）永远缺席时，合约的主要业务仍能顺利运行。
 

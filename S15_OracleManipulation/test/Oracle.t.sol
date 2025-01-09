@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import "../src/Oracle.sol";
@@ -32,7 +32,7 @@ contract OracleTest is Test {
         // 给自己账户 1000000 BUSD
         uint busdAmount = 1_000_000 * 10e18;
         deal(BUSD, alice, busdAmount);
-        // 2. 用busd买weth，推高顺时价格
+        // 2. 用busd买weth，推高瞬时价格
         vm.prank(alice);
         busd.transfer(address(this), busdAmount);
         swapBUSDtoWETH(busdAmount, 1);

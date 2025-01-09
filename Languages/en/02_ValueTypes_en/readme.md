@@ -6,20 +6,20 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science) | [@WTFAcademy_](http
 
 Community: [Discord](https://discord.gg/5akcruXrsk)｜[Wechat](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[Website wtf.academy](https://wtf.academy)
 
-Codes and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+Codes and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 
 -----
 
 ## Variable Types
 
-1. **Value Type**：This include boolean, integer, etc. These variables directly pass values when assigned.
+1. **Value Type**：This includes boolean, integer, etc. These variables directly pass values when assigned.
 
 2. **Reference Type**：including arrays and structures. These variables take up more space, directly pass addresses (similar to pointers) when assigned, and can be modified with multiple variable names.
 
 3. **Mapping Type**: hash tables in Solidity.
 
-4. **Function Type**：The Solidity documentation classifies functions into value types. But its very different from other types, and I put it in a separate category.
+4. **Function Type**：The Solidity documentation classifies functions into value types. But it's very different from other types, and I put it in a separate category.
 
 Only the commonly used types will be introduced here. In this chapter, we will introduce value types.
 
@@ -53,19 +53,19 @@ Code：
     bool public _bool5 = _bool != _bool1; // inequality
 ```
 
-From the above source code：the value of the variable `_bool` is `true`; `_bool1` is not`_bool`, which yields `false`; `_bool && _bool1` is `false`；`_bool || _bool1` is `true`；`_bool == _bool1` is `false`；and `_bool != _bool1` is `true`.
+From the above source code: the value of the variable `_bool` is `true`; `_bool1` is not`_bool`, which yields `false`; `_bool && _bool1` is `false`；`_bool || _bool1` is `true`；`_bool == _bool1` is `false`；and `_bool != _bool1` is `true`.
 
 **Important note：** The `&&` and `||` operator follows a short-circuit evaluation rule. This means that for an expression such as `f(x) || g(y)`, if `f(x)` is `true`, `g(y)` will not be evaluated.
 
 ### 2. Integers
 
-Integers types in Solidity includes signed integer `int` and unsigned integer `uint`. It can store up to a 256-bit integers or data units.
+Integers types in Solidity include signed integer `int` and unsigned integer `uint`. It can store up to a 256-bit integers or data units.
 
 ```solidity
     // Integer
-    int public _int = -1; // integers including negative numbers
-    uint public _uint = 1; // non-negative numbers
-    uint256 public _number = 20220330; // 256-bit positive integers
+    int public _int = -1; // integers including negative integers
+    uint public _uint = 1; // unsigned integers
+    uint256 public _number = 20220330; // 256-bit unsigned integers
 ```
 Commonly used integer operators include:
 
@@ -79,14 +79,14 @@ Code：
     uint256 public _number1 = _number + 1; // +, -, *, /
     uint256 public _number2 = 2**2; // Exponent
     uint256 public _number3 = 7 % 2; // Modulo (Modulus)
-    bool public _numberbool = _number2 > _number3; // Great than
+    bool public _numberbool = _number2 > _number3; // Greater than
 ```
 
 You can run the above code and check the values of each variable.
 
 ### 3. Addresses
 
-Addresses have following 2 types: 
+Addresses have the following 2 types: 
 - `address`: Holds a 20 byte value (size of an Ethereum address).
 
 - `address payable`: Same as `address`, but with the additional members `transfer` and `send` to allow ETH transfers.
@@ -117,7 +117,7 @@ Code：
     bytes1 public _byte = _byte32[0]; 
 ```
 
-In the above code, we assigned value `MiniSolidity` to the variable `_byte32`, or in hexadecimal: `0x4d696e69536f6c69646974790000000000000000000000000000000000000000`
+In the above code, we assigned the value `MiniSolidity` to the variable `_byte32`, or in hexadecimal: `0x4d696e69536f6c69646974790000000000000000000000000000000000000000`
 
 And `_byte` takes the value of the first byte of `_byte32`, which is `0x4d`.
 

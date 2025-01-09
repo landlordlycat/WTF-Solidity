@@ -17,7 +17,7 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science)
 
 Discord: [WTF Academy](https://discord.gg/5akcruXrsk)
 
-All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 Many Ethereum applications require the use of random numbers, such as NFT random tokenId selection, blind box drawing, and randomly determining the winner in gamefi battles. However, since all data on Ethereum is public and deterministic, it cannot provide developers with a method of generating random numbers like other programming languages. In this tutorial, we will introduce two methods of on-chain (hash function) and off-chain (Chainlink oracle) random number generation, and use them to create a tokenId random minting NFT.
 
@@ -64,25 +64,25 @@ In the tutorial, we use the `Rinkeby` testnet. After deploying the contract, use
 
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 contract RandomNumberConsumer is VRFConsumerBase {
     
-    bytes32 internal keyHash; // VRF唯一标识符
-    uint256 internal fee; // VRF使用手续费
+    bytes32 internal keyHash; // VRF unique identifier
+    uint256 internal fee; // VRF usage fee
     
-    uint256 public randomResult; // 存储随机数
+uint256 public randomResult; // store random numbers
     
-    /**
-     * 使用chainlink VRF，构造函数需要继承 VRFConsumerBase 
-     * 不同链参数填的不一样
-     * 网络: Rinkeby测试网
-     * Chainlink VRF Coordinator 地址: 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B
-     * LINK 代币地址: 0x01BE23585060835E02B77ef475b0Cc51aA1e0709
-     * Key Hash: 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
-     */
+     /**
+      * When using chainlink VRF, the constructor needs to inherit VRFConsumerBase
+      * Different chain parameters are filled in differently.
+      *Network: Rinkeby testnet
+      * Chainlink VRF Coordinator address: 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B
+      * LINK token address: 0x01BE23585060835E02B77ef475b0Cc51aA1e0709
+      * Key Hash: 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
+      */
     constructor() 
         VRFConsumerBase(
             0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B, // VRF Coordinator
@@ -90,7 +90,7 @@ contract RandomNumberConsumer is VRFConsumerBase {
         )
     {
         keyHash = 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
-        fee = 0.1 * 10 ** 18; // 0.1 LINK (VRF使用费，Rinkeby测试网)
+fee = 0.1 * 10 ** 18; // 0.1 LINK (VRF usage fee, Rinkeby test network)
     }
 ```
 
@@ -110,7 +110,7 @@ Users can call `requestRandomness()` inherited from the `VRFConsumerBase` contra
     }
 ```
 
-3. The `Chainlink` node generates a random number and a digital signature off-chain, and sends them to the `VRF` contract.
+3. The `Chainlink` node generates a random number and a digital signature off-chain and sends them to the `VRF` contract.
  
 4. The `VRF` contract verifies the validity of the signature.
  
@@ -118,12 +118,12 @@ Users can call `requestRandomness()` inherited from the `VRFConsumerBase` contra
  
 After verifying the validity of the signature in the `VRF` contract, the fallback function `fulfillRandomness()` of the user contract will be automatically called, and the off-chain generated random number will be sent over. The logic of consuming the random number should be implemented in this function.
  
-Note: The `requestRandomness()` function called by the user to request a random number and the fallback function `fulfillRandomness()` called when the `VRF` contract returns the random number are two separate transactions, with the user contract and the `VRF` contract being the callers, respectively. The latter will be a few minutes later than the former (with different chain delays).
+Note: The `requestRandomness()` function is called by the user to request a random number and the fallback function `fulfillRandomness()` is called when the `VRF` contract returns the random number are two separate transactions, with the user contract and the `VRF` contract being the callers, respectively. The latter will be a few minutes later than the former (with different chain delays).
 
 ```solidity
     /**
-     * VRF合约的回调函数，验证随机数有效之后会自动被调用
-     * 消耗随机数的逻辑写在这里
+* The callback function of the VRF contract will be automatically called after verifying that the random number is valid.
+      * The logic of consuming random numbers is written here
      */
     function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
         randomResult = randomness;
@@ -136,9 +136,9 @@ In this section, we will use on-chain and off-chain random numbers to create a `
 
 ```Solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
-import "https://github.com/AmazingAng/WTFSolidity/blob/main/34_ERC721/ERC721.sol";
+import "https://github.com/AmazingAng/WTF-Solidity/blob/main/34_ERC721/ERC721.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
 contract Random is ERC721, VRFConsumerBase{
@@ -205,62 +205,79 @@ In addition to the constructor function, the contract defines 5 other functions:
 - `fulfillRandomness()`: the callback function for `VRF`, which is automatically called by the `VRF` contract after verifying the authenticity of the random number. It uses the returned off-chain random number to mint an NFT.
 
 ```solidity
-    /** 
-    * 输入uint256数字，返回一个可以mint的tokenId
-    * 算法过程可理解为：totalSupply个空杯子（0初始化的ids）排成一排，每个杯子旁边放一个球，编号为[0, totalSupply - 1]。
-    每次从场上随机拿走一个球（球可能在杯子旁边，这是初始状态；也可能是在杯子里，说明杯子旁边的球已经被拿走过，则此时新的球从末尾被放到了杯子里）
-    再把末尾的一个球（依然是可能在杯子里也可能在杯子旁边）放进被拿走的球的杯子里，循环totalSupply次。相比传统的随机排列，省去了初始化ids[]的gas。
-    */
-    function pickRandomUniqueId(uint256 random) private returns (uint256 tokenId) {
-        uint256 len = totalSupply - mintCount++; // 可mint数量
-        require(len > 0, "mint close"); // 所有tokenId被mint完了
-        uint256 randomIndex = random % len; // 获取链上随机数
-        
-        //随机数取模，得到tokenId，作为数组下标，同时记录value为len-1，如果取模得到的值已存在，则tokenId取该数组下标的value
-        tokenId = ids[randomIndex] != 0 ? ids[randomIndex] : randomIndex; // 获取tokenId
-        ids[randomIndex] = ids[len - 1] == 0 ? len - 1 : ids[len - 1]; // 更新ids 列表
-        ids[len - 1] = 0; // 删除最后一个元素，能返还gas
+    /**
+     * Input a uint256 number and return a tokenId that can be mint
+     * The algorithm process can be understood as: totalSupply empty cups (0-initialized ids) are lined up in a row, and a ball is placed next to each cup, numbered [0, totalSupply - 1].
+     Every time a ball is randomly taken from the field (the ball may be next to the cup, which is the initial state; it may also be in the cup, indicating that the ball next to the cup has been taken away, then a new ball is placed from the end at this time into the cup)
+     Then put the last ball (still may be in the cup or next to the cup) into the cup of the removed ball, and loop totalSupply times. Compared with the traditional random arrangement, the gas for initializing ids[] is omitted.
+     */
+    function pickRandomUniqueId(
+        uint256 random
+    ) private returns (uint256 tokenId) {
+        // Calculate the subtraction first, then calculate ++, pay attention to the difference between (a++, ++a)
+        uint256 len = totalSupply - mintCount++; // mint quantity
+        require(len > 0, "mint close"); // all tokenIds are mint finished
+        uint256 randomIndex = random % len; // get the random number on the chain
+
+        // Take the modulus of the random number to get the tokenId as an array subscript, and record the value as len-1 at the same time. If the value obtained by taking the modulus already exists, then tokenId takes the value of the array subscript
+        tokenId = ids[randomIndex] != 0 ? ids[randomIndex] : randomIndex; // get tokenId
+        ids[randomIndex] = ids[len - 1] == 0 ? len - 1 : ids[len - 1]; // update ids list
+        ids[len - 1] = 0; // delete the last element, can return gas
     }
 
-    /** 
-    * 链上伪随机数生成
-    * keccak256(abi.encodePacked()中填上一些链上的全局变量/自定义变量
-    * 返回时转换成uint256类型
-    */
-    function getRandomOnchain() public view returns(uint256){
-        // remix跑blockhash会报错
-        bytes32 randomBytes = keccak256(abi.encodePacked(block.number, msg.sender, blockhash(block.timestamp-1)));
+    /**
+     * On-chain pseudo-random number generation
+     * keccak256(abi.encodePacked() fill in some global variables/custom variables on the chain
+     * Convert to uint256 type when returning
+     */
+    function getRandomOnchain() public view returns (uint256) {
+        /*
+         * In this case, randomness on the chain only depends on block hash, caller address, and block time,
+         * If you want to improve the randomness, you can add some attributes such as nonce, etc., but it cannot fundamentally solve the security problem
+         */
+        bytes32 randomBytes = keccak256(
+            abi.encodePacked(
+                blockhash(block.number - 1),
+                msg.sender,
+                block.timestamp
+            )
+        );
         return uint256(randomBytes);
     }
 
-    // 利用链上伪随机数铸造NFT
+    // Use the pseudo-random number on the chain to cast NFT
     function mintRandomOnchain() public {
-        uint256 _tokenId = pickRandomUniqueId(getRandomOnchain()); // 利用链上随机数生成tokenId
+        uint256 _tokenId = pickRandomUniqueId(getRandomOnchain()); // Use the random number on the chain to generate tokenId
         _mint(msg.sender, _tokenId);
     }
 
-    /** 
-     * 调用VRF获取随机数，并mintNFT
-     * 要调用requestRandomness()函数获取，消耗随机数的逻辑写在VRF的回调函数fulfillRandomness()中
-     * 调用前，把LINK代币转到本合约里
+    /**
+     * Call VRF to get random number and mintNFT
+     * To call the requestRandomness() function to obtain, the logic of consuming random numbers is written in the VRF callback function fulfillRandomness()
+     * Before calling, transfer LINK tokens to this contract
      */
     function mintRandomVRF() public returns (bytes32 requestId) {
-        // 检查合约中LINK余额
-        require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
-        // 调用requestRandomness获取随机数
+        // Check the LINK balance in the contract
+        require(
+            LINK.balanceOf(address(this)) >= fee,
+            "Not enough LINK - fill contract with faucet"
+        );
+        // Call requestRandomness to get a random number
         requestId = requestRandomness(keyHash, fee);
         requestToSender[requestId] = msg.sender;
         return requestId;
     }
 
     /**
-     * VRF的回调函数，由VRF Coordinator调用
-     * 消耗随机数的逻辑写在本函数中
+     * VRF callback function, called by VRF Coordinator
+     * The logic of consuming random numbers is written in this function
      */
-    function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-        address sender = requestToSender[requestId]; // 从requestToSender中获取minter用户地址
-        uint256 _tokenId = pickRandomUniqueId(randomness); // 利用VRF返回的随机数生成tokenId
-
+    function fulfillRandomness(
+        bytes32 requestId,
+        uint256 randomness
+    ) internal override {
+        address sender = requestToSender[requestId]; // Get minter user address from requestToSender
+        uint256 _tokenId = pickRandomUniqueId(randomness); // Use the random number returned by VRF to generate tokenId
         _mint(sender, _tokenId);
     }
 ```
@@ -278,17 +295,17 @@ In addition to the constructor function, the contract defines 5 other functions:
 After the contract is deployed, copy the contract address, and transfer `LINK` to the contract address just as you would for a normal transfer.
 ![Transfer LINK tokens](./img/39-4.png)
 
-### 4. Mint NFTs using onchain random numbers
+### 4. Mint NFTs using on-chain random numbers
 
-In the `remix` interface, click on the orange function `mintRandomOnchain` on the left side ![mintOnchain](./img/39-5-1.png), then click confirm in the pop-up `Metamask` to start minting the transaction using onchain random numbers.
+In the `remix` interface, click on the orange function `mintRandomOnchain` on the left side![mintOnchain](./img/39-5-1.png), then click confirm in the pop-up `Metamask` to start minting the transaction using on-chain random numbers.
 
 ![Mint NFTs using onchain random numbers](./img/39-5.png)
 
-### 5. Mint NFTs using `Chainlink VRF` offchain random numbers
+### 5. Mint NFTs using `Chainlink VRF` off-chain random numbers
 
 Similarly, in the `remix` interface, click on the orange function `mintRandomVRF` on the left and click confirm in the pop-up little fox wallet. The transaction of minting an `NFT` using `Chainlink VRF` off-chain random number has started.
 
-Note: when using `VRF` to mint `NFT`, initiating the transaction and the success of minting are not in the same block.
+Note: when using `VRF` to mint `NFT`, initiating the transaction and the success of minting is not in the same block.
 
 ![Transaction start for VRF minting](./img/39-6.png)
 ![Transaction success for VRF minting](./img/39-7.png)
@@ -299,6 +316,6 @@ From the above screenshots, it can be seen that in this example, the `NFT` with 
 
 ## Conclusion
 
-Generating a random number in `Solidity` is not as straightforward as in other programming languages. In this tutorial, we introduced two methods of generating random numbers on-chain (using hash functions) and off-chain (`Chainlink` oracle), and used them to create an `NFT` with a randomly assigned `tokenId`. Both methods have their own advantages and disadvantages: using on-chain random numbers is efficient but insecure, while generating off-chain random numbers relies on third-party oracle services, which is relatively safe but not as easy and economical. Project teams should choose the appropriate method according to their specific business needs.
+Generating a random number in `Solidity` is not as straightforward as in other programming languages. In this tutorial, we introduced two methods of generating random numbers on-chain (using hash functions) and off-chain (`Chainlink` oracle), and used them to create an `NFT` with a randomly assigned `tokenId`. Both methods have their advantages and disadvantages: using on-chain random numbers is efficient but insecure while generating off-chain random numbers relies on third-party Oracle services, which is relatively safe but not as easy and economical. Project teams should choose the appropriate method according to their specific business needs.
 
 Apart from these methods, there are other organizations that are trying new ways of RNG (Random Number Generation), such as [randao](https://github.com/randao/randao), which proposes to provide an on-chain and true randomness service in a DAO pattern.

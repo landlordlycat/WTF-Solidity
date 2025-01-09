@@ -14,7 +14,7 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science)
 
 Community: [Discord](https://discord.gg/5akcruXrsk) ｜ [WeChat group](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link) ｜ [Official website wtf.academy](https://wtf.academy)
 
-All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 -----
 
@@ -31,13 +31,13 @@ Is there a way to modify or upgrade the contract after it is deployed? The answe
 
 ![Proxy Pattern](./img/46-1.png)
 
-The proxy pattern separates contract data and logic, and saves them in different contracts. Taking the simple proxy contract in the above figure as an example, the data (state variable) is stored in the proxy contract, and the logic (function) is stored in another logic contract. The proxy contract (Proxy) delegates the function call to the logic contract (Implementation) through `delegatecall`, and then returns the final result to the caller(Caller).
+The proxy pattern separates contract data and logic and saves them in different contracts. Taking the simple proxy contract in the above figure as an example, the data (state variable) is stored in the proxy contract, and the logic (function) is stored in another logic contract. The proxy contract (Proxy) delegates the function call to the logic contract (Implementation) through `delegatecall`, and then returns the final result to the caller(Caller).
 
 The proxy pattern has two main benefits:
 1. Upgradeable: When we need to upgrade the logic of the contract, we only need to point the proxy contract to a new logic contract.
 2. Gas saving: If multiple contracts reuse a set of logic, we only need to deploy one logic contract, and then deploy multiple proxy contracts that only save data and point to the logic contract.
 
-**Tip**: If you are not familiar with `delegatecall`, you can refer to this tutorial [Lesson 23 Delegatecall](https://github.com/AmazingAng/WTFSolidity/tree/main/Languages/en/23_Delegatecall_en).
+**Tip**: If you are not familiar with `delegatecall`, you can refer to this tutorial [Lesson 23 Delegatecall](https://github.com/AmazingAng/WTF-Solidity/tree/main/Languages/en/23_Delegatecall_en).
 
 ## Proxy Contract
 
@@ -77,8 +77,8 @@ The fallback function of `Proxy` delegates external calls to the `Logic` contrac
 
 ```solidity
 /**
-* @dev fallback function, delegates invocations of current contract to `implementation` contract
-* with inline assembly, it gives fallback function a return value
+* @dev fallback function, delegates invocations of the current contract to `implementation` contract
+* with inline assembly, it gives the fallback function a return value
 */
 fallback() external payable {
     address _implementation = implementation;
@@ -87,7 +87,7 @@ fallback() external payable {
         // the parameters of opcode calldatacopy: start position of memory, start position of calldata, length of calldata
         calldatacopy(0, 0, calldatasize())
 
-        // use delegatecall to call implementation contract
+        // use delegatecall to call the implementation contract
         // the parameters of opcode delegatecall: gas, target contract address, start position of input memory, length of input memory, start position of output memory, length of output memory
         // set start position of output memory and length of output memory to 0
         // delegatecall returns 1 if success, 0 if fail
@@ -140,7 +140,7 @@ contract Logic {
 
 ### Caller contract
 
-The `Caller` contract demonstrates how to call a proxy contract, it's very simple. However, to understand it, you need to first learn about [Lesson 22: Call](https://github.com/AmazingAng/WTFSolidity/tree/main/Languages/en/22_Call_en/readme.md) and [Lesson 27: ABI encoding](https://github.com/AmazingAng/WTFSolidity/tree/main/Languages/en/27_ABIEncode_en/readme.md) in this tutorial.
+The `Caller` contract demonstrates how to call a proxy contract, it's very simple. However, to understand it, you need to first learn about [Lesson 22: Call](https://github.com/AmazingAng/WTF-Solidity/tree/main/Languages/en/22_Call_en/readme.md) and [Lesson 27: ABI encoding](https://github.com/AmazingAng/WTF-Solidity/tree/main/Languages/en/27_ABIEncode_en/readme.md) in this tutorial.
 
 There are 1 variable and 2 functions:
 - `proxy`: a state variable that records the proxy contract address.

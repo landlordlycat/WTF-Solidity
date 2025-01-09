@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // wtf.academy
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
 // selector clash example
 // uncomment the two lines of code, the contract fails to compile, because the selector of these two functions are identical
@@ -12,7 +12,7 @@ contract Foo {
 }
 
 
-// FOR TEACHING PURPOSE ONLY, DO NOT UES IN PRODUCTION
+// FOR TEACHING PURPOSE ONLY, DO NOT USE IN PRODUCTION
 contract TransparentProxy {
     // logic contract's address
     address implementation; 
@@ -28,7 +28,7 @@ contract TransparentProxy {
     }
 
     // fallback function, delegates function call to logic contract
-    // can not be called by admin, to avoid causing unexpected beahvior due to selector clash
+    // can not be called by admin, to avoid causing unexpected behavior due to selector clash
     fallback() external payable {
         require(msg.sender != admin);
         (bool success, bytes memory data) = implementation.delegatecall(msg.data);

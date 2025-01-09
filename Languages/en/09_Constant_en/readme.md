@@ -6,7 +6,7 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science) | [@WTFAcademy_](http
 
 Community: [Discord](https://discord.gg/5akcruXrsk)｜[Wechat](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[Website wtf.academy](https://wtf.academy)
 
-Codes and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+Codes and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 
 -----
@@ -19,7 +19,7 @@ Value-typed variables can be declared as `constant` and `immutable`; `string` an
 
 ### constant
 
-`constant` variable must be initialized during declaration and cannot be changed afterwards. Any modification attempt will result in error at compilation. 
+The `constant` variable must be initialized during declaration and cannot be changed afterwards. Any modification attempt will result in an error at compilation. 
 
 ``` solidity
     // The constant variable must be initialized when declared and cannot be changed after that
@@ -44,7 +44,7 @@ The `immutable` variable can be initialized during declaration or in the constru
 You can initialize the `immutable` variable using a global variable such as `address(this)`, `block.number`, or a custom function. In the following example, we use the `test()` function to initialize the `IMMUTABLE_TEST` variable to a value of `9`:
 
 ``` solidity
-    // The immutable variables are initialized with constructor, so that could use
+    // The immutable variables are initialized with the constructor, that is:
     constructor(){
         IMMUTABLE_ADDRESS = address(this);
         IMMUTABLE_BLOCK = block.number;
@@ -64,11 +64,11 @@ You can initialize the `immutable` variable using a global variable such as `add
 
    ![9-1.png](./img/9-1.png)   
    
-2. After `constant` variable is initialized, any attempt to change its value will result. In the example, the compiler throws: `TypeError: Cannot assign to a constant variable.`
+2. After the `constant` variable is initialized, any attempt to change its value will result. In the example, the compiler throws: `TypeError: Cannot assign to a constant variable.`
 
    ![9-2.png](./img/9-2.png)   
    
-3. After `immutable` variable is initialized, any attempt to change its value will result. In the example, the compiler throws: `TypeError: Immutable state variable already initialized.`
+3. After the `immutable` variable is initialized, any attempt to change its value will result. In the example, the compiler throws: `TypeError: Immutable state variable already initialized.`
 
    ![9-3.png](./img/9-3.png)
 

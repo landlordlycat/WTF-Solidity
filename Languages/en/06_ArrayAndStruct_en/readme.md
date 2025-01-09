@@ -6,7 +6,7 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science) | [@WTFAcademy_](http
 
 Community: [Discord](https://discord.gg/5akcruXrsk)｜[Wechat](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[Website wtf.academy](https://wtf.academy)
 
-Codes and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+Codes and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 
 -----
@@ -28,7 +28,7 @@ There are two types of arrays: fixed-sized and dynamically-sized arrays.：
     address[100] array3;
 ```
 
-- Dynamically-sized array（dynamic array）：Length of the array is not specified during declaration.  It uses the format of `T[]`, where `T` is the element type. 
+- Dynamically-sized array（dynamic array）： The length of the array is not specified during declaration.  It uses the format of `T[]`, where `T` is the element type. 
 
 ```solidity
     // variable-length array
@@ -38,13 +38,13 @@ There are two types of arrays: fixed-sized and dynamically-sized arrays.：
     bytes array7;
 ```
 
-**Notice**: `bytes` is special case, it is a dynamic array, but you don't need to add `[]` to it. You can use either `bytes` or `bytes1[]` to declare byte array, but not `byte[]`. `bytes` is recommended and consumes less gas than `bytes1[]`.
+**Notice**: `bytes` is a special case, it is a dynamic array, but you don't need to add `[]` to it. You can use either `bytes` or `bytes1[]` to declare a byte array, but not `byte[]`. `bytes` is recommended and consumes less gas than `bytes1[]`.
 
 ### Rules for creating arrays
 
 In Solidity, there are some rules for creating arrays：
 
-- For a `memory` dynamic array, it can be created with the `new` operator, but the length must be declared, and the length cannot be changed after the declaration. For example：
+- A `memory` dynamic array, can be created with the `new` operator, but the length must be declared, and the length cannot be changed after the declaration. For example：
 
 ```solidity
     // memory dynamic array

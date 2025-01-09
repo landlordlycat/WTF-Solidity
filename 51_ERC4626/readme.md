@@ -11,15 +11,15 @@ tags:
 
 # WTF Solidity极简入门: 51. ERC4626 代币化金库标准
 
-我最近在重新学solidity，巩固一下细节，也写一个“WTF Solidity极简入门”，供小白们使用（编程大佬可以另找教程），每周更新1-3讲。
+我最近在重新学 Solidity，巩固一下细节，也写一个“WTF Solidity极简入门”，供小白们使用（编程大佬可以另找教程），每周更新 1-3 讲。
 
-推特：[@0xAA_Science](https://twitter.com/0xAA_Science)
+推特：[@0xAA_Science](https://twitter.com/0xAA_Science)｜[@WTFAcademy_](https://twitter.com/WTFAcademy_)
 
 社区：[Discord](https://discord.gg/5akcruXrsk)｜[微信群](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[官网 wtf.academy](https://wtf.academy)
 
-所有代码和教程开源在github: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+所有代码和教程开源在 github: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
------
+---
 
 我们经常说 DeFi 是货币乐高，可以通过组合多个协议来创造新的协议；但由于 DeFi 缺乏标准，严重影响了它的可组合性。而 ERC4626 扩展了 ERC20 代币标准，旨在推动收益金库的标准化。这一讲，我们将介绍 DeFi 新一代标准 ERC4626，并写一个简单的金库合约。教学代码参考 openzeppelin 和 solmate 中的 ERC4626 合约，仅用作教学。
 
@@ -29,7 +29,7 @@ tags:
 
 - 收益农场: 在 Yearn Finance 中，你可以质押 `USDT` 获取利息。
 - 借贷: 在 AAVE 中，你可以出借 `ETH` 获取存款利息和贷款。
-- 质押: 在 Lido 中，你可以质押 `ETH` 参与 ETH 2.0 质押，得到可以升息的 `stETH`。
+- 质押: 在 Lido 中，你可以质押 `ETH` 参与 ETH 2.0 质押，得到可以生息的 `stETH`。
 
 ## ERC4626
 
@@ -47,7 +47,7 @@ tags:
 
 ### ERC4626 要点
 
-ERC4626 标准主要实现了一下几个逻辑：
+ERC4626 标准主要实现了以下几个逻辑：
 
 1. ERC20: ERC4626 继承了 ERC20，金库份额就是用 ERC20 代币代表的：用户将特定的 ERC20 基础资产（比如 WETH）存进金库，合约会给他铸造特定数量的金库份额代币；当用户从金库中提取基础资产时，会销毁相应数量的金库份额代币。`asset()` 函数会返回金库的基础资产的代币地址。
 2. 存款逻辑：让用户存入基础资产，并铸造相应数量的金库份额。相关函数为 `deposit()` 和 `mint()`。`deposit(uint assets, address receiver)` 函数让用户存入 `assets` 单位的资产，并铸造相应数量的金库份额给 `receiver` 地址。`mint(uint shares, address receiver)` 与它类似，只不过是以将铸造的金库份额作为参数。
@@ -67,7 +67,7 @@ IERC4626 接口合约还包含 `16` 个函数，根据功能分为 `4` 大类：
     - `asset()`: 返回金库的基础资产代币地址，用于存款，取款。
 - 存款/提款逻辑
     - `deposit()`: 存款函数，用户向金库存入 `assets` 单位的基础资产，然后合约铸造 `shares` 单位的金库额度给 `receiver` 地址。会释放 `Deposit` 事件。
-    - `mint()`: 铸造函数（也是存款函数），用户存入 `assets` 单位的基础资产，然后合约给 `receiver` 地址铸造相应数量的金库额度。会释放 `Deposit` 事件。
+    - `mint()`: 铸造函数（也是存款函数），用户指定想获得的 `shares` 单位的金库额度，函数经过计算后得出需要存入的 `assets` 单位的基础资产数量，然后合约从用户账户转出 `assets` 单位的基础资产，再给 `receiver` 地址铸造指定数量的金库额度。会释放 `Deposit` 事件。    
     - `withdraw()`: 提款函数，`owner` 地址销毁 `share` 单位的金库额度，然后合约将相应数量的基础资产发送给 `receiver` 地址。
     - `redeem()`: 赎回函数（也是提款函数），`owner` 地址销毁 `shares` 数量的金库额度，然后合约将相应单位的基础资产发给 `receiver` 地址
 - 会计逻辑
@@ -352,7 +352,7 @@ contract ERC4626 is ERC20, IERC4626 {
         _burn(owner, shares);
         _asset.transfer(receiver, assets);
 
-        // 释放 Withdraw 函数
+        // 释放 Withdraw 事件
         emit Withdraw(msg.sender, receiver, owner, assets, shares);
     }
 
@@ -374,7 +374,7 @@ contract ERC4626 is ERC20, IERC4626 {
         _burn(owner, shares);
         _asset.transfer(receiver, assets);
 
-        // 释放 Withdraw 函数        
+        // 释放 Withdraw 事件       
         emit Withdraw(msg.sender, receiver, owner, assets, shares);
     }
 
@@ -424,7 +424,7 @@ contract ERC4626 is ERC20, IERC4626 {
     }
 
     /*//////////////////////////////////////////////////////////////
-                     DEPOSIT/WITHDRAWAL LIMIT LOGIC
+                     存款/提款限额逻辑
     //////////////////////////////////////////////////////////////*/
     /** @dev See {IERC4626-maxDeposit}. */
     function maxDeposit(address) public view virtual returns (uint256) {
@@ -448,21 +448,33 @@ contract ERC4626 is ERC20, IERC4626 {
 }
 ```
 
+当然，本文中的`ERC4626`合约仅是为了教学演示使用，在实际使用时，还需要考虑如`Inflation Attack`, `Rounding Direction`等问题。在生产中，建议使用`openzeppelin`的具体实现。
+
 ## `Remix`演示
 
+**注意:** 以下运行示例使用了remix中第二个账户,即`0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2`, 来部署合约, 调用合约方法.
+
 1. 部署 `ERC20` 代币合约，将代币名称和符号均设为 `WTF`，并给自己铸造 `10000` 代币。
+![](./img/51-2-1.png)
+![](./img/51-2-2.png)
 
 2. 部署 `ERC4626` 代币合约，将基础资产的合约地址设为 `WTF` 的地址，名称和符号均设为 `vWTF`。
+![](./img/51-3.png)
 
 3. 调用 `ERC20` 合约的 `approve()` 函数，将代币授权给 `ERC4626` 合约。
+![](./img/51-4.png)
 
 4. 调用 `ERC4626` 合约的 `deposit()` 函数，存款 `1000` 枚代币。然后调用 `balanceOf()` 函数，查看自己的金库份额变为 `1000`。
+![](./img/51-5.png)
 
 5. 调用 `ERC4626` 合约的 `mint()` 函数，存款 `1000` 枚代币。然后调用 `balanceOf()` 函数查看自己的金库份额变为 `2000`。
+![](./img/51-6.png)
 
 6. 调用 `ERC4626` 合约的 `withdraw()` 函数，取款 `1000` 枚代币。然后调用 `balanceOf()` 函数查看自己的金库份额变为 `1000`。
+![](./img/51-7.png)
 
 7. 调用 `ERC4626` 合约的 `redeem()` 函数，取款 `1000` 枚代币。然后调用 `balanceOf()` 函数查看自己的金库份额变为 `0`。
+![](./img/51-8.png)
 
 ## 总结
 

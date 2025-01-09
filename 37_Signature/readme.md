@@ -10,15 +10,15 @@ tags:
 
 # WTF Solidity极简入门: 37. 数字签名 Signature
 
-我最近在重新学solidity，巩固一下细节，也写一个“WTF Solidity极简入门”，供小白们使用（编程大佬可以另找教程），每周更新1-3讲。
+我最近在重新学 Solidity，巩固一下细节，也写一个“WTF Solidity极简入门”，供小白们使用（编程大佬可以另找教程），每周更新 1-3 讲。
 
-欢迎关注我的推特：[@0xAA_Science](https://twitter.com/0xAA_Science)
+推特：[@0xAA_Science](https://twitter.com/0xAA_Science)｜[@WTFAcademy_](https://twitter.com/WTFAcademy_)
 
-欢迎加入WTF科学家社区，内有加微信群方法：[链接](https://discord.gg/5akcruXrsk)
+社区：[Discord](https://discord.gg/5akcruXrsk)｜[微信群](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link)｜[官网 wtf.academy](https://wtf.academy)
 
-所有代码和教程开源在github（1024个star发课程认证，2048个star发社群NFT）: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+所有代码和教程开源在 github: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
------
+---
 
 这一讲，我们将简单的介绍以太坊中的数字签名`ECDSA`，以及如何利用它发放`NFT`白名单。代码中的`ECDSA`库由`OpenZeppelin`的同名库简化而成。
 
@@ -32,7 +32,7 @@ tags:
 
 1. **身份认证**：证明签名方是私钥的持有人。
 2. **不可否认**：发送方不能否认发送过这个消息。
-3. **完整性**：消息在传输过程中无法被修改。
+3. **完整性**：通过验证针对传输消息生成的数字签名，可以验证消息是否在传输过程中被篡改。
 
 ## `ECDSA`合约
 
@@ -76,7 +76,7 @@ tags:
      * 以及`EIP191`:https://eips.ethereum.org/EIPS/eip-191`
      * 添加"\x19Ethereum Signed Message:\n32"字段，防止签名的是可执行交易。
      */
-    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {
+    function toEthSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
         // 哈希的长度为32
         return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
     }
@@ -110,7 +110,7 @@ ethereum.request({method: "personal_sign", params: [account, hash]})
 ![浏览器console调用metamask进行签名](./img/37-4.jpg)
 
 **3-2. 利用web3.py签名：** 批量调用中更倾向于使用代码进行签名，以下是基于web3.py的实现。
-```
+```py
 from web3 import Web3, HTTPProvider
 from eth_account.messages import encode_defunct
 
@@ -120,7 +120,7 @@ rpc = 'https://rpc.ankr.com/eth'
 w3 = Web3(HTTPProvider(rpc))
 
 #打包信息
-msg = Web3.solidityKeccak(['address','uint256'], [address,0])
+msg = Web3.solidity_keccak(['address','uint256'], [address,0])
 print(f"消息：{msg.hex()}")
 #构造可签名信息
 message = encode_defunct(hexstr=msg.hex())
@@ -137,7 +137,7 @@ print(f"签名：{signed_message['signature'].hex()}")
 
 为了验证签名，验证者需要拥有`消息`，`签名`，和签名使用的`公钥`。我们能验证签名的原因是只有`私钥`的持有者才能够针对交易生成这样的签名，而别人不能。
 
-**4. 通过签名和消息恢复公钥：**`签名`是由数学算法生成的。这里我们使用的是`rsv签名`，`签名`中包含`r, s, v`三个值的信息。而后，我们可以通过`r, s, v`及`以太坊签名消息`来求得`公钥`。下面的`recoverSigner()`函数实现了上述步骤，它利用`以太坊签名消息 _msgHash`和`签名 _signature`恢复`公钥`（使用了简单的内联汇编）：
+**4. 通过签名和消息恢复公钥：**`签名`是由数学算法生成的。这里我们使用的是`rsv签名`，`签名`中包含`r, s, v`三个值的信息，长度分别为32 bytes，32 bytes，1 byte。而后，我们可以通过`r, s, v`及`以太坊签名消息`来求得`公钥`。下面的`recoverSigner()`函数实现了上述步骤，它利用`以太坊签名消息 _msgHash`和`签名 _signature`恢复`公钥`（使用了简单的内联汇编）：
 
 ```solidity
     // @dev 从_msgHash和签名_signature中恢复signer地址
@@ -171,6 +171,9 @@ print(f"签名：{signed_message['signature'].hex()}")
 _msgHash：0xb42ca4636f721c7a331923e764587e98ec577cea1a185f60dfcc14dbb9bd900b
 _signature：0x390d704d7ab732ce034203599ee93dd5d3cb0d4d1d7c600ac11726659489773d559b12d220f99f41d17651b0c1c6a669d346a397f8541760d6b32a5725378b241c
 ```
+
+需要注意的是，这里需要对输入参数`_signature`的长度进行检查，确保其长度为65bytes，否则会产生签名重放问题。具体问题可以参考[BlazCTF中的Cyber Cartel](https://github.com/DeFiHackLabs/blazctf-2024-writeup/blob/main/writeup/cyber-cartel.md).
+
 ![通过签名和消息恢复公钥](./img/37-8.png)
 
 **5. 对比公钥并验证签名：** 接下来，我们只需要比对恢复的`公钥`与签名者公钥`_signer`是否相等：若相等，则签名有效；否则，签名无效：

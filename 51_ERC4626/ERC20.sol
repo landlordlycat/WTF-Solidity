@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // WTF Solidity by 0xAA
 
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -18,7 +18,7 @@ contract ERC20 is IERC20 {
     
     uint8 public decimals = 18; // 小数位数
 
-    // @dev 在合约部署的时候实现合约名称和符号
+    // @dev 在合约部署的时候实现代币名称和符号
     constructor(string memory name_, string memory symbol_){
         name = name_;
         symbol = symbol_;

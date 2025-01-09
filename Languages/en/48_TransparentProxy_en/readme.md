@@ -15,7 +15,7 @@ Twitter: [@0xAA_Science](https://twitter.com/0xAA_Science)
 
 Community: [Discord](https://discord.gg/5akcruXrsk) | [WeChat group](https://docs.google.com/forms/d/e/1FAIpQLSe4KGT8Sh6sJ7hedQRuIYirOoZK_85miz3dw7vA1-YjodgJ-A/viewform?usp=sf_link) | [Official website wtf.academy](https://wtf.academy)
 
-All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTFSolidity](https://github.com/AmazingAng/WTFSolidity)
+All code and tutorials are open source on GitHub: [github.com/AmazingAng/WTF-Solidity](https://github.com/AmazingAng/WTF-Solidity)
 
 -----
 
@@ -23,7 +23,7 @@ In this lesson, we will introduce the selector clash issue in proxy contracts, a
 
 ## Selector Clash
 
-In smart contracts, a function selector is the hash of a function signature's first 4 bytes. For example, the selector of function `mint(address account)` is `bytes4(keccak256("mint(address)"))`, which is `0x6a627842`. More about function selectors see [WTF Solidity Tutorial #29: Function Selectors](https://github.com/AmazingAng/WTFSolidity/blob/main/Languages/en/29_Selector_en/readme.md).
+In smart contracts, a function selector is the hash of a function signature's first 4 bytes. For example, the selector of function `mint(address account)` is `bytes4(keccak256("mint(address)"))`, which is `0x6a627842`. For more about function selectors see [WTF Solidity Tutorial #29: Function Selectors](https://github.com/AmazingAng/WTF-Solidity/blob/main/Languages/en/29_Selector_en/readme.md).
 
 Because a function selector has only 4 bytes, its range is very small. Therefore, two different functions may have the same selector, such as the following two functions:
 
@@ -46,11 +46,11 @@ Currently, there are two upgradeable contract standards that solve this problem:
 The logic of the transparent proxy is very simple: admin may mistakenly call the upgradable functions of the proxy contract when calling the functions of the logic contract because of the "selector clash". Restricting the admin's privileges can solve the conflict:
 
 - The admin becomes a tool person and can only upgrade the contract by calling the upgradable function of the proxy contract, without calling the fallback function to call the logic contract.
-- Other users cannot call upgradable function, but can call functions of the logic contract.
+- Other users cannot call the upgradable function but can call functions of the logic contract.
 
 ### Proxy Contract
 
-The proxy contract here is very similar to the one in [Lecture 47](https://github.com/AmazingAng/WTFSolidity/blob/main/Languages/en/47_Upgrade_en/readme.md), except that the `fallback()` function restricts the call by the admin address.
+The proxy contract here is very similar to the one in [Lecture 47](https://github.com/AmazingAng/WTF-Solidity/blob/main/Languages/en/47_Upgrade_en/readme.md), except that the `fallback()` function restricts the call by the admin address.
 
 It contains three variables:
 
@@ -65,7 +65,7 @@ It contains `3` functions:
 - `upgrade()`: An upgrade function that changes the logic contract address and can only be called by the `admin`.
 
 ```solidity
-// FOR TEACHING PURPOSE ONLY, DO NOT UES IN PRODUCTION
+// FOR TEACHING PURPOSE ONLY, DO NOT USE IN PRODUCTION
 contract TransparentProxy {
     // logic contract's address
     address implementation; 
@@ -81,7 +81,7 @@ contract TransparentProxy {
     }
 
     // fallback function, delegates function call to logic contract
-    // can not be called by admin, to avoid causing unexpected beahvior due to selector clash
+    // can not be called by admin, to avoid causing unexpected behavior due to selector clash
     fallback() external payable {
         require(msg.sender != admin);
         (bool success, bytes memory data) = implementation.delegatecall(msg.data);
@@ -97,18 +97,18 @@ contract TransparentProxy {
 
 ### Logic Contract
 
-The new and old logic contracts here are the same as in [Lecture 47](https://github.com/AmazingAng/WTFSolidity/blob/main/Languages/en/47_Upgrade_en/readme.md). The logic contracts contain `3` state variables, consistent with the proxy contract to prevent slot conflicts. It also contains a function `foo()`, where the old logic contract will change the value of `words` to `"old"`, and the new one will change it to `"new"`.
+The new and old logic contracts here are the same as in [Lecture 47](https://github.com/AmazingAng/WTF-Solidity/blob/main/Languages/en/47_Upgrade_en/readme.md). The logic contracts contain `3` state variables, consistent with the proxy contract to prevent slot conflicts. It also contains a function `foo()`, where the old logic contract will change the value of `words` to `"old"`, and the new one will change it to `"new"`.
 
 ```solidity
 // old logic contract
 contract Logic1 {
-    // state variable should be the same as proxy contract, in case of slot clash
+    // state variable should be the same as a proxy contract, in case of slot clash
     address public implementation; 
     address public admin; 
-    // string variable, can be modified by calling loginc contract's function
+    // string variable, can be modified by calling the logic contract's function
     string public words; 
 
-    // to change state variable in proxy contract, selector 0xc2985578
+    //To change state variable in proxy contract, selector 0xc2985578
     function foo() public{
         words = "old";
     }
@@ -116,13 +116,13 @@ contract Logic1 {
 
 // new logic contract
 contract Logic2 {
-    // state variable should be the same as proxy contract, in case of slot clash
+    // state variable should be the same as a proxy contract, in case of slot clash
     address public implementation; 
     address public admin; 
-    // string variable, can be modified by calling loginc contract's function
+    // string variable, can be modified by calling the logic contract's function
     string public words;
 
-    // to change state variable in proxy contract, selector 0xc2985578
+    //To change state variable in proxy contract, selector 0xc2985578
     function foo() public{
         words = "new";
     }
@@ -152,6 +152,6 @@ contract Logic2 {
 
 ## Summary
 
-In this lesson, we introduced the "selector clash" in proxy contracts and how to avoid this problem using transparent proxy. The logic of transparent proxy is simple, solving the "selector clash" problem by restricting the admin's access to the logic contract. However, it has a drawback that every time a user calls a function, there is an additional check for whether or not the caller is the admin, which consumes more gas. Nevertheless, transparent proxy are still the solution chosen by most project teams.
+In this lesson, we introduced the "selector clash" in proxy contracts and how to avoid this problem using a transparent proxy. The logic of transparent proxy is simple, solving the "selector clash" problem by restricting the admin's access to the logic contract. However, it has a drawback; every time a user calls a function, there is an additional check for whether or not the caller is the admin, which consumes more gas. Nevertheless, transparent proxies are still the solution chosen by most project teams.
 
 In the next lesson, we will introduce the general Universal Upgradeable Proxy Standard (UUPS), which is more complex but consumes less gas.

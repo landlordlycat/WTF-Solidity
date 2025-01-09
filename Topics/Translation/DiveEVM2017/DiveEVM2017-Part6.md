@@ -16,11 +16,11 @@
 
 如果你对前面的内容不熟悉，请阅读前面的文章：
 
-* [深入以太坊虚拟机 Part1 — 汇编与字节码](https://github.com/AmazingAng/WTFSolidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part1.md)
-* [深入以太坊虚拟机 Part2 — 固定长度数据类型的表示 ](https://github.com/AmazingAng/WTFSolidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part2.md)
-* [深入以太坊虚拟机 Part3 — 动态数据类型的表示](https://github.com/AmazingAng/WTFSolidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part3.md)
-* [深入以太坊虚拟机 Part4 — 智能合约外部方法调用](https://github.com/AmazingAng/WTFSolidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part4.md)
-* [深入以太坊虚拟机 Part5 — 智能合约创建过程](https://github.com/AmazingAng/WTFSolidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part5.md)
+* [深入以太坊虚拟机 Part1 — 汇编与字节码](https://github.com/AmazingAng/WTF-Solidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part1.md)
+* [深入以太坊虚拟机 Part2 — 固定长度数据类型的表示 ](https://github.com/AmazingAng/WTF-Solidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part2.md)
+* [深入以太坊虚拟机 Part3 — 动态数据类型的表示](https://github.com/AmazingAng/WTF-Solidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part3.md)
+* [深入以太坊虚拟机 Part4 — 智能合约外部方法调用](https://github.com/AmazingAng/WTF-Solidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part4.md)
+* [深入以太坊虚拟机 Part5 — 智能合约创建过程](https://github.com/AmazingAng/WTF-Solidity/blob/main/Topics/Translation/DiveEVM2017/DiveEVM2017-Part5.md)
 
 ## Solidity Events
 
@@ -75,12 +75,12 @@ pragma solidity ^0.4.18;
 
 contract Logger {
 	function Logger() public {
-		log0(0xc0fefe);
+		log0(0xc0fefefe);
 	}
 }
 ```
 
-生成的汇编可以分为两半。前半部分将日志数据（`0xc0fefe`​）从堆栈复制到内存中。后半部分将 `log0`​ 指令的参数放在堆栈上，告诉它在内存中加载数据的位置。
+生成的汇编可以分为两半。前半部分将日志数据（`0xc0fefefe`​）从堆栈复制到内存中。后半部分将 `log0`​ 指令的参数放在堆栈上，告诉它在内存中加载数据的位置。
 
 带注释的汇编：
 
@@ -89,19 +89,19 @@ memory: { 0x40 => 0x60 }
 
 tag_1:
   // copy data into memory
-  0xc0fefe
-    [0xc0fefe]
+  0xc0fefefe
+    [0xc0fefefe]
   mload(0x40)
-    [0x60 0xc0fefe]
+    [0x60 0xc0fefefe]
   swap1
-    [0xc0fefe 0x60]
+    [0xc0fefefe 0x60]
   dup2
-    [0x60 0xc0fefe 0x60]
+    [0x60 0xc0fefefe 0x60]
   mstore
     [0x60]
     memory: {
       0x40 => 0x60
-      0x60 => 0xc0fefe
+      0x60 => 0xc0fefefe
     }
 
 // calculate data start position and size
@@ -163,7 +163,7 @@ pragma solidity ^0.4.18;
 
 contract Logger {
 	function Logger() public {
-		log2(0xc0fefe, 0xaaaa1111, 0xbbbb2222);
+		log2(0xc0fefefe, 0xaaaa1111, 0xbbbb2222);
 	}
 }
 ```
@@ -177,7 +177,7 @@ tag_1:
   0xaaaa1111
 
 // copy data into memory
-  0xc0fefe
+  0xc0fefefe
   mload(0x40)
   swap1
   dup2
@@ -194,12 +194,12 @@ tag_1:
   log2
 ```
 
-数据还是 `0xc0fefe`​，复制到内存。在执行 `log2`​ 之前，EVM 的状态如下所示：
+数据还是 `0xc0fefefe`​，复制到内存。在执行 `log2`​ 之前，EVM 的状态如下所示：
 
 ```shell
 stack: [0x60 0x20 0xaaaa1111 0xbbbb2222]
 memory: {
-  0x60: 0xc0fefe
+  0x60: 0xc0fefefe
 }
 
 log2
